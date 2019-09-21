@@ -1,0 +1,157 @@
+plugins {
+  id 'java'
+  id 'org.hidetake.ssh' version '2.10.1'    // SSH/SCP/SFTP https://gradle-ssh-plugin.github.io/docs/
+}
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+
+// SSH connection to EV3
+remotes {
+  ev3 {
+    host = 'ev3dev.local'
+    user = 'robot'
+    password = 'maker'
+  }
+}
+
+
+// source file locations
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src/main/java']
+    }
+    resources {
+      srcDirs = ['src/main/java']   // keep resources next to the Java code that reads them in
+    }
+  }
+}
+
+
+// build self-contained JAR
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.github.drichm.ev3.server.servlet.NanoServletApp'
+    }
+    
+    // put all dependencies into one fat jar
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+
+// deploy built JAR to Windows Nano server directory
+/* NO NEED - RUN FROM ECLIPSE
+task deploy(type: Copy) {
+  group       "EV3"
+  description "Build and Deploy"
+
+  from jar
+  //from sourceSets.main.compileClasspath
+  into "../nano"
+}
+*/
+
+ext {
+  webappDir = project.projectDir.getAbsolutePath() + '/src/main/webapp/'
+
+  serverEV3 = '/home/robot/nano'
+  shellEV3  = '/home/robot/nano/server.sh'
+  webappEV3 = '/home/robot/nano/debug'
+}
+
+
+// deploy built JAR to EV3
+task deployEV3 {
+  group       "EV3"
+  description "Deploy to EV3"
+  
+  dependsOn jar
+
+  doLast {
+    ssh.run {
+      session(remotes.ev3) {
+        put from: jar.archivePath, into: serverEV3
+      }
+    }
+  }
+}
+
+
+// generate server execution script on EV3
+task setupEV3 {
+  group       "EV3"
+  description "Setup EV3"
+
+  doLast {
+    ssh.run {
+      session(remotes.ev3) {
+        put  text: '''#!/bin/bash
+java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=7999,suspend=n -jar ev3.jar $@
+''', into: shellEV3
+        execute 'chmod +x ' + shellEV3
+      }
+    }
+  }
+}
+
+
+// deploy web-app files to EV3
+task webappEV3 {
+  group       "EV3"
+  description "Deploy Web-App to EV3"
+  
+  doLast {
+    ssh.run {
+      session(remotes.ev3) {
+        put from: webappDir + 'index.html', into: webappEV3
+        put from: webappDir + 'css'       , into: webappEV3
+        put from: webappDir + 'js'        , into: webappEV3
+      }
+    }
+  }
+}
+
+
+// deploy all web-app support files to EV3
+task webappSupportEV3 {
+  group       "EV3"
+  description "Deploy Web-App supporting files to EV3"
+  
+  doLast {
+    ssh.run {
+      session(remotes.ev3) {
+        execute 'mkdir -p ' + webappEV3
+        put from: webappDir + 'assets', into: webappEV3
+      }
+    }
+  }
+}
+
+
+dependencies {
+  compile 'org.nanohttpd:nanohttpd:2.3.1'
+
+  // Nano sockets do no work with Chrome (Sept 2019)
+  //compile 'org.nanohttpd:nanohttpd-websocket:2.3.1'
+
+  // We do our own web-server
+  //compile 'org.nanohttpd:nanohttpd-webserver:2.3.1'
+  
+  /* Adds 4MB to JAR size!
+  compile 'io.undertow:undertow-core:2.0.26.Final'
+  compile 'io.undertow:undertow-servlet:2.0.26.Final'
+  compile 'io.undertow:undertow-websockets-jsr:2.0.26.Final'
+  */
+
+  compile 'com.google.code.gson:gson:2.8.5'
+  compile 'com.github.spullara.mustache.java:compiler:0.9.6'
+
+  // Use JUnit test framework
+  testImplementation 'junit:junit:4.12'
+}
