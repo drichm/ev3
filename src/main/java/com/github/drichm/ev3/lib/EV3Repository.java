@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import com.github.drichm.ev3.lib.device.DeviceNode;
+import com.github.drichm.ev3.lib.devices.Device;
 import com.github.drichm.ev3.lib.hardware.DeviceNodeInstance;
 import com.github.drichm.ev3.lib.hardware.SysFS;
 
@@ -22,11 +24,17 @@ public class EV3Repository
   /** subpath:instance map for active node instances */
   private final Map<String,DeviceNodeInstance> active = new ConcurrentHashMap<>();
   
+  /** Known Devices */
+  private final Map<DeviceNode,Device>         device = new ConcurrentHashMap<>();
+
   
   public EV3Repository( SysFS sysfs )
   {
     this.sysfs = sysfs;
   }
+  
+  
+  protected void add( Device device )  { this.device.put( device.node, device ); }
   
   
   // ==========================================================================

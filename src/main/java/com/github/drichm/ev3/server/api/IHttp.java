@@ -1,4 +1,4 @@
-package com.github.drichm.ev3.server.servlet;
+package com.github.drichm.ev3.server.api;
 
 import java.io.InputStream;
 import java.io.Reader;

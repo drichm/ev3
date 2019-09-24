@@ -1,7 +1,7 @@
-package com.github.drichm.ev3.server;
+package com.github.drichm.ev3.server.servlet;
 
-import com.github.drichm.ev3.server.servlet.IHttp;
-import com.github.drichm.ev3.server.servlet.IServer;
+import com.github.drichm.ev3.server.api.IHttp;
+import com.github.drichm.ev3.server.api.IServer;
 
 /** Abstract mini-server - a server that serves URLs under some root context URL */
 abstract public class UrlContextServer implements IServer

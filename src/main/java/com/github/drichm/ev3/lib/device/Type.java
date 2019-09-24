@@ -3,6 +3,9 @@ package com.github.drichm.ev3.lib.device;
 /** Attribute value types */
 public enum Type
 {
+  /** Port address */
+  a,
+
   /** String text */
   s,
   

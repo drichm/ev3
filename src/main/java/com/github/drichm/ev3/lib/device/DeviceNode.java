@@ -18,5 +18,22 @@ public class DeviceNode extends Named
     this.type    = type;
     this.subtype = subtype;
   }
+  
+  public String subpath()  { return name(); }
+  
+
+  @Override public int hashCode()  { return name().hashCode(); }
+  
+  @Override public boolean equals( Object obj )
+  {
+    if ( obj instanceof String )
+      // for Map lookup
+      return name().equalsIgnoreCase( (String) obj );
+    else
+    if ( obj instanceof DeviceNode )
+      return name().equals( ((DeviceNode) obj).name() );
+    else
+      return false;
+  }
 
 }

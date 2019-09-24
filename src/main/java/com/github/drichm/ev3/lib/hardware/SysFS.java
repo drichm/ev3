@@ -1,6 +1,7 @@
 package com.github.drichm.ev3.lib.hardware;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -66,7 +67,7 @@ public class SysFS
     if ( n == 0 )
       return name;
     else
-      return name.substring( 0, n+1 ) + replacement;
+      return name.substring( 0, n ) + replacement;
   }
   
   
@@ -127,6 +128,19 @@ public class SysFS
   }
 
 
+  /** Raw low-level string reader, throws any file system exception  */
+  public String readString( String path ) throws IOException
+  {
+    return Files.readString( root.resolve( path ) ).trim();
+  }
+
+  /** Raw low-level bytes reader, throws any file system exception  */
+  public byte[] readBytes( String path ) throws IOException
+  {
+    return Files.readAllBytes( root.resolve( path ) );
+  }
+
+  
   // ==========================================================================
   // Scanning
   

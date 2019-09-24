@@ -1,5 +1,9 @@
 package com.github.drichm.ev3.lib.devices;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.github.drichm.ev3.lib.device.Attribute;
 import com.github.drichm.ev3.lib.device.DeviceNode;
 
@@ -10,13 +14,18 @@ import com.github.drichm.ev3.lib.device.DeviceNode;
  */
 public class Device
 {
-  public final DeviceNode  node;
-  public final Attribute[] attributes;
+  public final DeviceNode            node;
+  public final Map<String,Attribute> attributes = new HashMap<>();
   
-  public Device( DeviceNode node, Attribute... attributes )
+  public Device( DeviceNode node )
   {
-    this.node       = node;
-    this.attributes = attributes;
+    this.node = node;
+  }
+
+  protected void add( Attribute... add )
+  {
+    if ( add != null )
+      Arrays.stream( add ).forEach( a -> attributes.put( a.name(), a ) );
   }
 
 }

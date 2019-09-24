@@ -15,9 +15,9 @@ public class Defaults
   /** Debugging on Windows */
   static public boolean ON_WINDOWS = "Windows_NT".equalsIgnoreCase( System.getenv( "OS" ) );
   
-  /** Disk location of ev3.debug web-app */
+  /** Disk location of ev3 debug web-app */
   static public Path    DEBUG_APP  = ON_WINDOWS 
-                                      ? Paths.get("").toAbsolutePath().getParent().resolve( "debug/WebContent" )
+                                      ? Paths.get("").toAbsolutePath().resolve( "src/main/webapp" )
                                       : Paths.get("").toAbsolutePath().resolve( "debug" );
   
 

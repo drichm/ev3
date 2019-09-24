@@ -1,11 +1,11 @@
-package com.github.drichm.ev3.server;
+package com.github.drichm.ev3.server.servlet;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.github.drichm.ev3.server.servlet.IHttp;
+import com.github.drichm.ev3.server.api.IHttp;
 import com.github.drichm.ev3.server.utils.Mime;
 
 /**

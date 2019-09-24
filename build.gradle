@@ -35,7 +35,7 @@ sourceSets {
 // build self-contained JAR
 jar {
     manifest {
-        attributes 'Main-Class': 'com.github.drichm.ev3.server.servlet.NanoServletApp'
+        attributes 'Main-Class': 'com.github.drichm.ev3.server.api.NanoServletApp'
     }
     
     // put all dependencies into one fat jar
@@ -60,16 +60,16 @@ task deploy(type: Copy) {
 ext {
   webappDir = project.projectDir.getAbsolutePath() + '/src/main/webapp/'
 
-  serverEV3 = '/home/robot/nano'
-  shellEV3  = '/home/robot/nano/server.sh'
-  webappEV3 = '/home/robot/nano/debug'
+  serverEV3 = '/home/robot/server'
+  shellEV3  = '/home/robot/server/server.sh'
+  webappEV3 = '/home/robot/server/debug'
 }
 
 
 // deploy built JAR to EV3
-task deployEV3 {
+task jarEV3 {
   group       "EV3"
-  description "Deploy to EV3"
+  description "Deploy JAR to EV3"
   
   dependsOn jar
 
@@ -83,26 +83,8 @@ task deployEV3 {
 }
 
 
-// generate server execution script on EV3
-task setupEV3 {
-  group       "EV3"
-  description "Setup EV3"
-
-  doLast {
-    ssh.run {
-      session(remotes.ev3) {
-        put  text: '''#!/bin/bash
-java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=7999,suspend=n -jar ev3.jar $@
-''', into: shellEV3
-        execute 'chmod +x ' + shellEV3
-      }
-    }
-  }
-}
-
-
 // deploy web-app files to EV3
-task webappEV3 {
+task appEV3 {
   group       "EV3"
   description "Deploy Web-App to EV3"
   
@@ -118,20 +100,34 @@ task webappEV3 {
 }
 
 
-// deploy all web-app support files to EV3
-task webappSupportEV3 {
+// EV3 one-time setup
+task setupEV3 {
   group       "EV3"
-  description "Deploy Web-App supporting files to EV3"
-  
+  description "One-time EV3 Setup"
+
   doLast {
     ssh.run {
       session(remotes.ev3) {
+
+        execute 'mkdir -p ' + serverEV3
+      
+        // generate server execution script  
+        put  text: '''#!/bin/bash
+java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=7999,suspend=n -jar ev3.jar $@
+''', into: shellEV3
+        execute 'chmod +x ' + shellEV3
+
+				// copy dependency JARs: not needed, we build a fat JAR with them in
+        // put from: sourceSets.main.compileClasspath, into: serverEV3
+
+        // copy static Web-App assets
         execute 'mkdir -p ' + webappEV3
         put from: webappDir + 'assets', into: webappEV3
       }
     }
   }
 }
+
 
 
 dependencies {

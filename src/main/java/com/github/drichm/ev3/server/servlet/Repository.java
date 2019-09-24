@@ -1,11 +1,14 @@
-package com.github.drichm.ev3.server;
+package com.github.drichm.ev3.server.servlet;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import com.github.drichm.ev3.lib.EV3Repository;
+import com.github.drichm.ev3.lib.hardware.AttributeInstance;
 import com.github.drichm.ev3.lib.hardware.DeviceNodeInstance;
 import com.github.drichm.ev3.lib.hardware.SysFS;
-import com.github.drichm.ev3.server.servlet.IHttp;
+import com.github.drichm.ev3.server.Defaults;
+import com.github.drichm.ev3.server.api.IHttp;
 
 
 /** Serve EV3 status as JSON */
@@ -19,17 +22,30 @@ public class Repository extends UrlContextServer
   
   //===========================================================================
 
-  static public class JsonReply
+  public class JsonReply
   {
-    public final DeviceNodeInstance[] nodes;
+    public final JsonEntry[] nodes;
     
     public long millis;
 
     public JsonReply( DeviceNodeInstance[] nodes )
     {
-      this.nodes  = nodes;
+      this.nodes  = Arrays.stream( nodes  ).map( JsonEntry::new ).toArray( JsonEntry[]::new );
     }
   }
+
+  public class JsonEntry
+  {
+    public final DeviceNodeInstance  node;
+    public final AttributeInstance[] attr;
+    
+    public JsonEntry( DeviceNodeInstance node )
+    {
+      this.node = node;
+      this.attr = repo.sysfs.attributes( node ).toArray( AttributeInstance[]::new );
+    }
+  }
+  
 
   
   //===========================================================================

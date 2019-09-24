@@ -1,7 +1,7 @@
-package com.github.drichm.ev3.server;
+package com.github.drichm.ev3.server.servlet;
 
 import com.github.drichm.ev3.json.Memory;
-import com.github.drichm.ev3.server.servlet.IHttp;
+import com.github.drichm.ev3.server.api.IHttp;
 
 
 /** Serve EV3 status as JSON */

@@ -12,11 +12,11 @@ public class LegoSonicSensorEV3 extends LegoSensor
 {
   public LegoSonicSensorEV3()
   {
-    super( new Attribute( "driver_name", "lego-ev3-us" )
-         , new Attribute( "mode"       , "US-DIST-CM", "US-DIST-IN", "US-LISTEN", "US-SI-CM", "US-SI-IN", "US-DC-CM", "US-DC-IN" )
-         , new Attribute( "modes"      , Type.sl, Mode.ro )
-         , new Attribute( "units"      , Type.s , Mode.ro )
-         , new Attribute( "value{N}"   , Type.s , Mode.ro )
-         );
+    add( new Attribute( "driver_name", "lego-ev3-us" )
+       , new Attribute( "mode"       , "US-DIST-CM", "US-DIST-IN", "US-LISTEN", "US-SI-CM", "US-SI-IN", "US-DC-CM", "US-DC-IN" )
+       , new Attribute( "modes"      , Type.sl, Mode.ro )
+       , new Attribute( "units"      , Type.s , Mode.ro )
+       , new Attribute( "value0"     , Type.s , Mode.ro )
+       );
   }
 }
